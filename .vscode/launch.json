@@ -8,7 +8,7 @@
             "mainClass": "com.ecommerce.backend.BackendApplication",
             "projectName": "backend",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/backend/src/main/resources/.env"
         }
     ]
 }
