@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 *.env
+e-comerce-400123-8dc8abaddf62.json
+credentials.json
+*/Tokens
+StoredCredential
 
 ### STS ###
 .apt_generated
