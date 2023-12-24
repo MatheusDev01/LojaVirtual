@@ -22,7 +22,7 @@ public class PermissaoPessoaController {
     @Autowired
     private PermissaoPessoaService permissaoPessoaService;
 
-    @GetMapping("/")
+        @GetMapping("/")
     public List<PermissaoPessoa> buscarTodos(){
         return permissaoPessoaService.buscarTodos();
     }
@@ -42,4 +42,5 @@ public class PermissaoPessoaController {
             permissaoPessoaService.excluir(id);
             return ResponseEntity.ok().build();
     }
-}
+
+    }
