@@ -36,6 +36,9 @@ public class Pessoa {
     //falta adicionar verificações
     private String cpf;
     private String email;
+    private String codigoVerificacao;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataEnvioCodigo;
     private String senha;
     private String endereco;
     private String cep;
