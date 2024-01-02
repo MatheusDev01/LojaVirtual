@@ -38,7 +38,7 @@ public class CarrinhoCompraController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable("id") Long id){
+    public ResponseEntity<Void> excluir(@PathVariable Long id){
             carrinhoCompraService.excluir(id);
             return ResponseEntity.ok().build();
     }

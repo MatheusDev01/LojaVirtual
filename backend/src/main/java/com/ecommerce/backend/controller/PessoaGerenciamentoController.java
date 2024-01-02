@@ -1,7 +1,6 @@
 package com.ecommerce.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,14 +16,14 @@ public class PessoaGerenciamentoController {
 
 
     
-    @PostMapping("/")
-    public String RecuperarSenha(@RequestParam("email") String email) {
+    @PostMapping("/enviarcodigo")
+    public String RecuperarSenha(@RequestParam String email) {
       return pessoagerenciamento.solicitarCodigo(email);
     }
 
-    @PostMapping("/validarcodigo")
-    public String validarCodigo(@RequestParam("email") String email, @RequestParam("codigo") String codigo) {
-      return pessoagerenciamento.validarCodigo(codigo, email);
+    @PostMapping("/alterarsenha")
+    public String AlterarSenha(@RequestParam String email, @RequestParam String codigo, @RequestParam String novasenha) {
+      return pessoagerenciamento.validarCodigo(codigo, email, novasenha);
     }
 
   

@@ -38,7 +38,7 @@ public class PermissaoPessoaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable("id") Long id){
+    public ResponseEntity<Void> excluir(@PathVariable Long id){
             permissaoPessoaService.excluir(id);
             return ResponseEntity.ok().build();
     }

@@ -1,13 +1,12 @@
     package com.ecommerce.backend.service;
 
     import java.nio.charset.Charset;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.stereotype.Service;
 
@@ -33,7 +32,15 @@ import org.springframework.beans.factory.annotation.Autowired;
                 pessoa.setCodigoVerificacao(gerarCodigoVerificacao(10));
                 pessoa.setDataEnvioCodigo(new Date());
                 pessoaRepository.saveAndFlush(pessoa);
-                emailService.enviarEmailTexto(email, "Recuperação de Senha", "Olá, seu código de recuperação é: "+ pessoa.getCodigoVerificacao());
+                //emailService.enviarEmailTexto(email, "Recuperação de Senha", "Olá, seu código de recuperação é: "+ pessoa.getCodigoVerificacao());
+                Map<String, Object> proprMap = new HashMap<>();
+                proprMap.put("name", pessoa.getName());
+                proprMap.put("mensagem", pessoa.getCodigoVerificacao());
+                proprMap.put("email", email);
+                proprMap.put("titulo1", "Recuperação de Senha");
+                proprMap.put("titulo2","Existe uma requisição para redefinir sua senha!");
+                proprMap.put("texto1", "Se você não fez essa requisição, ignore este e-mail. Para redefinir a senha utilize o código abaixo:");
+                emailService.enviarEmailTemplate(email, "Recuperação de Senha", proprMap);
                 return "Código enviado";
             }
         }
@@ -71,16 +78,29 @@ import org.springframework.beans.factory.annotation.Autowired;
         }
         
         //Validar codigo
-        public String validarCodigo(String codigo, String email){
+        public String validarCodigo(String codigo, String email, String novaSenha){
             Pessoa pessoa = pessoaRepository.findByCodigoVerificacao(codigo);
-            String emailPessoa = pessoa.getEmail();
-            if (pessoa != null && (emailPessoa.intern() == email.intern())) {
-                Long dataEnvioCodigo = pessoa.getDataEnvioCodigo().getTime();
-                Date dataAgora = new Date();
-                Long minutoAgora = dataAgora.getTime();
-                if (dataEnvioCodigo >= (minutoAgora - 900000)){
-                    return "Código Válido";
-                } else {return "O código expirou. Favor, gerar outro código.";}
-            } return "O código é inválido ou não há cadastro com o email informado.";
+            if (pessoa != null){
+                String emailPessoa = pessoa.getEmail();
+                    if (emailPessoa.intern() == email.intern()) {
+                        Long dataEnvioCodigo = pessoa.getDataEnvioCodigo().getTime();
+                        Date dataAgora = new Date();
+                        Long minutoAgora = dataAgora.getTime();
+                        if (dataEnvioCodigo >= (minutoAgora - 900000)){
+                            pessoa.setSenha(novaSenha);
+                            pessoa.setCodigoVerificacao(null);
+                            pessoaRepository.saveAndFlush(pessoa);
+                            return "Senha Alterada";
+                        } else {
+                            return "O código expirou. Favor, gerar outro código.";
+                            }
+                    } else {
+                        return "Não há cadastro com o email informado.";
+                        }
+                } else {
+                        return "O código é inválido";
+                        }
+
+
         }
     }

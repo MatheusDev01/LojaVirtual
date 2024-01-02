@@ -35,7 +35,7 @@ public class ImagensController {
 
   //Upload file
   @PostMapping("/")
-  public ResponseEntity<String> uploadFile(@RequestParam("idProduto") Long idProduto, @RequestParam("file") MultipartFile file) throws IOException {
+  public ResponseEntity<String> uploadFile(@RequestParam Long idProduto, @RequestParam MultipartFile file) throws IOException {
 
     fileService.uploadFile(idProduto, file);
 
@@ -45,7 +45,7 @@ public class ImagensController {
   //Delete file
   @DeleteMapping("/")
   public ResponseEntity<String> deleteFile(
-          @RequestParam("fileName") String fileName) {
+          @RequestParam String fileName) {
 
     fileService.deleteFile(fileName);
 

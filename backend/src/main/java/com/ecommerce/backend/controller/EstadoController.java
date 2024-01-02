@@ -39,7 +39,7 @@ public class EstadoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable("id") Long id){
+    public ResponseEntity<Void> excluir(@PathVariable Long id){
             estadoService.excluir(id);
             return ResponseEntity.ok().build();
     }
