@@ -13,7 +13,7 @@ import com.ecommerce.backend.service.PessoaClienteService;
 
 @RestController
 @RequestMapping("/api/pessoacliente")
-@CrossOrigin
+@CrossOrigin("http://localhost:5173")
 public class PessoaClienteController {
     @Autowired
     private PessoaClienteService pessoaService;

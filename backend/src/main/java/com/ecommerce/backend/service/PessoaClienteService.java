@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
     import com.ecommerce.backend.dto.PessoaClienteRequestDTO;
     import com.ecommerce.backend.entity.Pessoa;
@@ -17,17 +19,17 @@ import org.springframework.beans.factory.annotation.Autowired;
         PessoaClienteRepository pessoaRepository;
 
         @Autowired
-        private PermissaoPessoaService permissaoPessoaService;
-
-        @Autowired
         EmailService emailService;
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
         public Pessoa registrar(PessoaClienteRequestDTO pessoaClienteRequestDTO) {
             Pessoa pessoa = new PessoaClienteRequestDTO().converter(pessoaClienteRequestDTO);
             pessoa.setDataCriacao(new Date());
+            pessoa.setSenha(passwordEncoder.encode(pessoa.getSenha()));
+            pessoa.setPermissaoPessoa("user");
             Pessoa pessoaNovo = pessoaRepository.saveAndFlush(pessoa);
-            permissaoPessoaService.vincularPessoaPermissaoCliente(pessoaNovo);
             //emailService.enviarEmailTexto(pessoaNovo.getEmail(), "Cadastro na lojavirtual", "Cadastro realizado com sucesso");
             Map<String, Object> proprMap = new HashMap<>();
                 proprMap.put("name", pessoa.getName());

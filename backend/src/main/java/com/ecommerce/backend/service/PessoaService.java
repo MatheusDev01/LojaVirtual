@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.backend.entity.Pessoa;
@@ -19,12 +20,16 @@ public class PessoaService {
     }
 
     public Pessoa inserir(Pessoa objeto){
+        var passwordEncoder = new BCryptPasswordEncoder();
         objeto.setDataCriacao(new Date());
+        objeto.setSenha(passwordEncoder.encode(objeto.getSenha()));
         Pessoa pessoaNovo = pessoaRepository.saveAndFlush(objeto);
         return pessoaNovo;
     }
     public Pessoa alterar(Pessoa objeto){
+        var passwordEncoder = new BCryptPasswordEncoder();
         objeto.setDataAtualizacao(new Date());
+        objeto.setSenha(passwordEncoder.encode(objeto.getSenha()));
         return pessoaRepository.saveAndFlush(objeto);
     }
     public void excluir(Long id){

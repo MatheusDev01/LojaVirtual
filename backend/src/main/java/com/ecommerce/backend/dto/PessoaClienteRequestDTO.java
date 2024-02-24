@@ -14,7 +14,9 @@ public class PessoaClienteRequestDTO {
     private String email;
     private String cep;
     private String endereco;
-    private Cidade cidade;
+    private String cidade;
+    private String Estado;
+    private String senha;
     
 
     public Pessoa converter(PessoaClienteRequestDTO pessoaClienteRequestDTO){

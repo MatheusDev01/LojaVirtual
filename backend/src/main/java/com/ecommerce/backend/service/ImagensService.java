@@ -1,7 +1,9 @@
 package com.ecommerce.backend.service;
 
+import com.ecommerce.backend.entity.Estado;
 import com.ecommerce.backend.entity.Imagens;
 import com.ecommerce.backend.entity.Produto;
+import com.ecommerce.backend.repository.EstadoRepository;
 import com.ecommerce.backend.repository.ImagensREP;
 import com.ecommerce.backend.repository.ImagensRepository;
 import com.ecommerce.backend.repository.ProdutoRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -77,14 +80,52 @@ public class ImagensService implements ImagensRepository {
         Imagens objeto = new Imagens();
 
         String nomeImagem = String.valueOf(produto.getId()) + file.getOriginalFilename();
+        List<Imagens> imagens = imagensREP.findByname(nomeImagem);
+        if (imagens == null){
+            BlobId blobId = BlobId.of(bucketName, nomeImagem);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).
+                    setContentType(file.getContentType()).build();
+            Blob blob = storage.create(blobInfo,file.getBytes());
 
-        BlobId blobId = BlobId.of(bucketName, nomeImagem);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).
-                setContentType(file.getContentType()).build();
-        Blob blob = storage.create(blobInfo,file.getBytes());
+            objeto.setName(nomeImagem);
+            objeto.setProduto(produto);
+            objeto = imagensREP.saveAndFlush(objeto);
+            produto.setImage(nomeImagem);
+            produto = produtoRepository.saveAndFlush(produto);
+        } else {
+            nomeImagem = nomeImagem + imagens.size();
+            BlobId blobId = BlobId.of(bucketName, nomeImagem);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).
+                    setContentType(file.getContentType()).build();
+            Blob blob = storage.create(blobInfo,file.getBytes());
 
-        objeto.setName(nomeImagem);
-        objeto.setProduto(produto);
-        objeto = imagensREP.saveAndFlush(objeto);
+            objeto.setName(nomeImagem);
+            objeto.setProduto(produto);
+            objeto = imagensREP.saveAndFlush(objeto);
+            produto.setImage(nomeImagem);
+            produto = produtoRepository.saveAndFlush(produto);
+        }
     }
+
+     @Autowired
+    private ImagensREP imagensREP2;
+
+    public List<Imagens> buscarPeloId(Produto produto){
+        return imagensREP2.findByproduto(produto);
+    }
+
+    public Imagens inserir(Imagens objeto){
+        objeto.setDataCriacao(new Date());
+        Imagens objetoNovo = imagensREP2.saveAndFlush(objeto);
+        return objetoNovo;
+    }
+    public Imagens alterar(Imagens objeto){
+        objeto.setDataAtualizacao(new Date());
+        return imagensREP2.saveAndFlush(objeto);
+    }
+    public void excluir(Long id){
+        Imagens objeto = imagensREP2.findById(id).get();
+        imagensREP2.delete(objeto);
+    }
+
 }

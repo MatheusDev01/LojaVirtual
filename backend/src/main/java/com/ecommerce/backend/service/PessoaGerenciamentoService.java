@@ -1,6 +1,9 @@
     package com.ecommerce.backend.service;
 
     import java.nio.charset.Charset;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +11,17 @@ import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
-    import com.ecommerce.backend.entity.Pessoa;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.ecommerce.backend.entity.Pessoa;
     import com.ecommerce.backend.repository.PessoaRepository;
+import com.google.api.client.util.Value;
 
     @Service
     public class PessoaGerenciamentoService {
@@ -24,11 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
         public String solicitarCodigo(String email) {
-            List<Pessoa> pessoaLista = pessoaRepository.findByEmail(email);
+            List<UserDetails> pessoaLista = pessoaRepository.findByEmail(email);
             if (pessoaLista.isEmpty()){
                 return "O email não está cadastrado";
             } else {
-                Pessoa pessoa = pessoaLista.get(0);
+                Pessoa pessoa = (Pessoa) pessoaLista.get(0);
                 pessoa.setCodigoVerificacao(gerarCodigoVerificacao(10));
                 pessoa.setDataEnvioCodigo(new Date());
                 pessoaRepository.saveAndFlush(pessoa);
@@ -103,4 +113,48 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
         }
+
+        
+        
+
+        //TokenAutenticação
+        public String gerarToken(Pessoa user){
+
+            Pessoa p = (Pessoa) pessoaRepository.findByEmail(user.getUsername()).get(0);
+            
+            try {
+                String secret = System.getenv("TOKEN");
+                Algorithm algorithm = Algorithm.HMAC256(secret);
+                String token = JWT.create()
+                                .withIssuer("LojaVirtual")
+                                .withSubject(user.getUsername())
+                                .withExpiresAt(getInstantExpiration())
+                                .sign(algorithm);
+                    p.setToken(token);
+                    pessoaRepository.saveAndFlush(p);
+                return token;
+            } catch (JWTCreationException exception) {
+                throw new RuntimeException("Erro ao gerar token", exception);
+            }
+        }
+
+        public String validarToken(String token){
+            try {
+                String secret = System.getenv("TOKEN");
+                Algorithm algorithm = Algorithm.HMAC256(secret);
+
+                return JWT.require(algorithm)
+                        .withIssuer("LojaVirtual")
+                        .build()
+                        .verify(token)
+                        .getSubject();
+            } catch (JWTVerificationException exception) {
+                return "Erro";
+            }
+        }
+
+        public Instant getInstantExpiration(){
+            return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        }
+
     }

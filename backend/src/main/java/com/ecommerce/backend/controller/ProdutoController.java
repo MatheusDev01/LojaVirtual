@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.ecommerce.backend.service.ProdutoService;
 
 @RestController
 @RequestMapping("/api/produto")
+@CrossOrigin("http://localhost:5173")
 public class ProdutoController {
     @Autowired
     private ProdutoService produtoService;
@@ -28,12 +30,12 @@ public class ProdutoController {
     }
     
     @PostMapping("/")
-    public Produto inserir(@RequestBody Produto objeto){
+    public String inserir(@RequestBody Produto objeto){
         return produtoService.inserir(objeto);
     }
 
     @PutMapping("/")
-    public Produto alterar(@RequestBody Produto objeto){
+    public String alterar(@RequestBody Produto objeto){
         return produtoService.alterar(objeto);
     }
 
